@@ -23,8 +23,8 @@ export class Modal extends Component {
   render() {
     const { id, largeImage, tag } = this.props;
     return createPortal(
-      <div className="Overlay" onClick={this.onClose}>
-        <div className="Modal" key={id}>
+      <div className="Overlay">
+        <div className="Modal" key={id} onClick={this.onClose}>
           <img src={largeImage} alt={tag} />
         </div>
       </div>,
