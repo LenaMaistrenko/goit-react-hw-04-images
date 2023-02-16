@@ -6,7 +6,6 @@ import { ImageGallery } from './ImageGallery/ImageGallery';
 import { Loader } from './Loader/Loader';
 import { Button } from './Button/Button';
 import { getAlbumsService } from '../services/gallery';
-
 export class App extends Component {
   state = {
     filter: '',
@@ -19,7 +18,6 @@ export class App extends Component {
     const { filter, page } = this.state;
     if (prevState.filter !== filter || prevState.page !== page) {
       this.setState({ status: 'loading' });
-
       try {
         {
           const response = await getAlbumsService(filter, page);
@@ -45,11 +43,9 @@ export class App extends Component {
   handleFilterSubmit = filter => {
     this.setState({ filter, page: 1, albums: [] });
   };
-
   handlerLoadMore = () => {
     this.setState(prevState => ({ page: prevState.page + 1 }));
   };
-
   render() {
     const { albums, status, totalHits } = this.state;
     return (
