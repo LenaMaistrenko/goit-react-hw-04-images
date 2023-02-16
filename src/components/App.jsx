@@ -31,8 +31,8 @@ export class App extends Component {
           }
 
           this.setState(prevState => ({
-            albums: [...prevState.albums, ...hits], // if page ===1, то albums: hits;
-            totalHits: totalHits - [...prevState.albums, ...hits].length, // totalHits - albums.length
+            albums: [...prevState.albums, ...hits],
+            totalHits: totalHits - [...prevState.albums, ...hits].length,
             status: 'fulfilled',
           }));
         }
