@@ -19,21 +19,19 @@ export class App extends Component {
     if (prevState.filter !== filter || prevState.page !== page) {
       this.setState({ status: 'loading' });
       try {
-        {
-          const response = await getAlbumsService(filter, page);
-          const { hits, totalHits } = response;
-          if (totalHits === 0) {
-            alert('Nothing was found for your request');
-            this.setState({ status: 'fulfilled' });
-            return;
-          }
-
-          this.setState(prevState => ({
-            albums: [...prevState.albums, ...hits],
-            totalHits: totalHits - [...prevState.albums, ...hits].length,
-            status: 'fulfilled',
-          }));
+        const response = await getAlbumsService(filter, page);
+        const { hits, totalHits } = response;
+        if (totalHits === 0) {
+          alert('Nothing was found for your request');
+          this.setState({ status: 'fulfilled' });
+          return;
         }
+
+        this.setState(prevState => ({
+          albums: [...prevState.albums, ...hits],
+          totalHits: totalHits - [...prevState.albums, ...hits].length,
+          status: 'fulfilled',
+        }));
       } catch (error) {
         this.setState({ status: 'rejected' });
         throw new Error(error.message);
