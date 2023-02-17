@@ -1,61 +1,63 @@
 import './styles.css';
-import React from 'react';
-import { Component } from 'react';
+import React, { useState, useEffect } from 'react';
 import { Searchbar } from './Searchbar/Searchbar';
 import { ImageGallery } from './ImageGallery/ImageGallery';
 import { Loader } from './Loader/Loader';
 import { Button } from './Button/Button';
 import { getAlbumsService } from '../services/gallery';
-export class App extends Component {
-  state = {
-    filter: '',
-    albums: [],
-    status: 'idle',
-    totalHits: 0,
-    page: 1,
-  };
-  async componentDidUpdate(prevProps, prevState) {
-    const { filter, page } = this.state;
-    if (prevState.filter !== filter || prevState.page !== page) {
-      this.setState({ status: 'loading' });
+export function App() {
+  const [filter, setFilter] = useState('');
+  const [albums, setAlbums] = useState([]);
+  const [status, setStatus] = useState('idle');
+  const [totalHits, setTotalHits] = useState(0);
+  const [page, setPage] = useState(1);
+
+  useEffect(() => {
+    if (!filter) return;
+
+    async function getImage() {
+      setStatus('loading');
       try {
         const response = await getAlbumsService(filter, page);
+
         const { hits, totalHits } = response;
+        setAlbums(prevState => [...prevState, ...hits]);
+        setTotalHits(totalHits);
+        //setTotalHits([totalHits - albums.length]);
+        setStatus('fulfilled');
+        console.log('totalHits', totalHits);
         if (totalHits === 0) {
           alert('Nothing was found for your request');
-          this.setState({ status: 'fulfilled' });
+          setStatus('fulfilled');
           return;
         }
-
-        this.setState(prevState => ({
-          albums: [...prevState.albums, ...hits],
-          totalHits: totalHits - [...prevState.albums, ...hits].length,
-          status: 'fulfilled',
-        }));
       } catch (error) {
-        this.setState({ status: 'rejected' });
+        setStatus('rejected');
         throw new Error(error.message);
       }
     }
-  }
-  handleFilterSubmit = filter => {
-    this.setState({ filter, page: 1, albums: [] });
+    getImage();
+  }, [filter, page]);
+
+  const handleFilterSubmit = filter => {
+    setFilter(filter);
+    setPage(1);
+    setAlbums([]);
   };
-  handlerLoadMore = () => {
-    this.setState(prevState => ({ page: prevState.page + 1 }));
+
+  const handlerLoadMore = () => {
+    setPage(prevState => prevState + 1);
   };
-  render() {
-    const { albums, status, totalHits } = this.state;
-    return (
-      <>
-        {' '}
-        <div className="App">
-          <Searchbar onSubmit={this.handleFilterSubmit} />
-          {status === 'loading' && <Loader />}
-          <ImageGallery albums={albums} />
-          {Boolean(totalHits) && <Button onLoadMore={this.handlerLoadMore} />}
-        </div>
-      </>
-    );
-  }
+  const koef = Math.ceil(totalHits / 12);
+  return (
+    <>
+      {' '}
+      <div className="App">
+        <Searchbar onSubmit={handleFilterSubmit} />
+        {status === 'loading' && <Loader />}
+        <ImageGallery albums={albums} />
+        {koef > 1 && koef !== page && <Button onLoadMore={handlerLoadMore} />}
+      </div>
+    </>
+  );
 }
